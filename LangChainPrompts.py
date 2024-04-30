@@ -36,7 +36,7 @@ You MUST return Final Answer if no more tools are needed. For Final Answer the r
 ```
 {{{{
   "action": "Final Answer",
-  "action_input": Done
+  "action_input": "Done"
 }}}}
 ```
 
@@ -59,6 +59,7 @@ Here is the user's input (remember to respond with a markdown code snippet of a 
 TEMPLATE_TOOL_RESPONSE = """ The tool has produced the following output: 
 {observation}.
 
+Tools MUST NOT be used with temporary txt files.
 Choose if another tool is needed or return Final Answer.
 
 """

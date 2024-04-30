@@ -39,6 +39,12 @@ class OutputParser(ConvoOutputParser):
         try:
             # Attempt to parse the text into a structured format (assumed to be JSON
             # stored as markdown)
+            if "Final Answer" in text:
+                text = """ ```json {
+                  "action": "Final Answer",
+                  "action_input": "Done"
+                }```"""
+
             response = parse_json_markdown(text)
 
             # If the response contains an 'action' and 'action_input'

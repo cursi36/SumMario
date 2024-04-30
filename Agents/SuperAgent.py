@@ -12,15 +12,6 @@ from LangChainPrompts import *
 
 import os
 
-# def parsefilename(message):
-#     # folder_save = os.getcwd() + "/tmp_files/"
-#     searches = re.search(r'tmp_files(.*?).txt', message)
-#     filename = None
-#     if searches is not None:
-#         filename = searches.group(1)
-#         filename = os.path.join(os.getcwd(), "tmp_files" + filename + ".txt")
-#
-#     return filename
 
 def parsefilename(filename):
     if os.getcwd() in filename:
@@ -59,6 +50,17 @@ class ConversationalAgent(BaseTool):
     """
     agent: ConversationAgent = None
 
+    def read_txt(self,filename):
+        try:
+            with open(filename, 'r',encoding="utf-8") as file:
+                text = file.read()
+        except:
+            with open(filename, 'r') as file:
+                text = file.read()
+
+        return text
+
+
     def parse_message_and_filename(self,message):
         message_ = (message.replace("[", "")).replace("]", "")
         split_tries = ['",', "',"]
@@ -72,9 +74,8 @@ class ConversationalAgent(BaseTool):
         try:
             if filename is not None and 'none' not in filename.lower():
                 filename = parsefilename(filename)
-                with open(filename, 'r') as file:
-                    text = file.read()
-                user_message = user_message + f"\n You MUST consider the following corresponding reference text: ```{text}```"
+                text = self.read_txt(filename)
+                user_message = user_message + f"\n You MUST use the following text: ```{text}```"
         except:
             pass
 

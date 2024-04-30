@@ -324,8 +324,8 @@ class WebPageTextExtractor(BaseTool):
 class FileReader(BaseTool):
     name = "FileReader"
     description = """Takes as input a user given file name (powerpoint,word, pdf) and extract the text in it.
-    It MUST NOT be used with temporary txt files.
-    Input type: string #the filename (not a temporary txt file)
+    It MUST NOT be used with temporary .txt files generated from other tools.
+    Input type: string #the filename (must not be a txt file)
     Output type: string #the name of the temporary saved file
     """
 
@@ -333,40 +333,42 @@ class FileReader(BaseTool):
     def _run(self, file_path):
         _, file_extension = os.path.splitext(file_path)
         file_extension = file_extension.lower()
+        try:
+            if file_extension == '.txt':
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    text = file.read()
 
-        if file_extension == '.txt':
-            with open(file_path, 'r', encoding='utf-8') as file:
-                text = file.read()
+            elif file_extension == '.pdf':
+                text = ''
+                with open(file_path, 'rb') as file:
+                    pdf_reader = PyPDF2.PdfReader(file)
+                    for page_num in range(pdf_reader.numPages):
+                        page = pdf_reader.getPage(page_num)
+                        text += page.extractText()
 
-        elif file_extension == '.pdf':
-            text = ''
-            with open(file_path, 'rb') as file:
-                pdf_reader = PyPDF2.PdfReader(file)
-                for page_num in range(pdf_reader.numPages):
-                    page = pdf_reader.getPage(page_num)
-                    text += page.extractText()
+            elif file_extension == '.docx':
+                doc = Document(file_path)
+                text = ''
+                for paragraph in doc.paragraphs:
+                    text += paragraph.text + '\n'
 
-        elif file_extension == '.docx':
-            doc = Document(file_path)
-            text = ''
-            for paragraph in doc.paragraphs:
-                text += paragraph.text + '\n'
+            elif file_extension == '.pptx':
+                prs = Presentation(file_path)
+                text = ''
+                for slide in prs.slides:
+                    for shape in slide.shapes:
+                        if hasattr(shape, 'text'):
+                            text += shape.text + '\n'
 
-        elif file_extension == '.pptx':
-            prs = Presentation(file_path)
-            text = ''
-            for slide in prs.slides:
-                for shape in slide.shapes:
-                    if hasattr(shape, 'text'):
-                        text += shape.text + '\n'
+            else:
+                text = "Unsupported file format"
 
-        else:
-            text = "Unsupported file format"
+            text = SummarizeText(self.text_summarizer, text)
+            text = f"The file contains the following text:\n {text}"
 
-        text = SummarizeText(self.text_summarizer, text)
-        text = f"The file contains the following text:\n {text}"
-
-        filename = save_file("file_content", text)
+            filename = save_file("file_content", text)
+        except:
+            filename = file_path
 
         return f"The file content is saved in the temporary file: {filename} "
 
@@ -444,7 +446,7 @@ class GoogleWebSearcher(BaseTool):
                 pass
 
             if len(page_text):
-                results = results+f"The webpage at {url} contains the following information:\n ```{page_text} ``` \n"
+                results = results+f"\n The webpage at {url} contains the following information:\n {page_text}  \n"
 
         # text = text.replace("\xa0", " ")
         text = f"""The web search has returned the following results: 

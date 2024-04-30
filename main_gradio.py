@@ -42,6 +42,11 @@ class myApp():
 
 
 if __name__ == "__main__":
+    try:
+        os.mkdir("./tmp_files/")
+    except:
+        pass
+
     app = myApp()
 
     with gr.Blocks() as demo:
