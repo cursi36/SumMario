@@ -1,12 +1,13 @@
 import sys
 sys.path.append("./Agents/")
-import gradio as gr
 import os
+os.environ['OPENAI_API_KEY'] = ""
+
+import gradio as gr
 import time
 from Agents.SuperAgent import create_SuperAgent
 import os
 
-os.environ['OPENAI_API_KEY'] = ""
 
 class myApp():
 
