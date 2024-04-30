@@ -4,5 +4,7 @@ This is SumMario, an AI agent capable of performing online web searches and summ
 
 It is based on Langchain and Gradio. It uses a SupeAgent to manage the work of a ConversationalAgent (for general purpose conversation), and a ToolAgent for using available tools for searching news online, summarizing files and youtube videos.
 
-##Example:
+## Example:
+
+
 ![](https://github.com/cursi36/SumMario/blob/master/example_SumMario.gif)
