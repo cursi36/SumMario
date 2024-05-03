@@ -141,6 +141,7 @@ def create_SuperAgent():
         Your goal is to only properly call the tools. 
         You MUST always reason if external resources are needed first or if you can directly use the conversational tool.
         Reminder that DataRetriever MUST NOT be used with temporary txt files.
+        You should favour using ConversationalAgent with stored data over DataRetriever.
         You MUST NOT add any additional text to the one output from the tools.
         """
 
