@@ -123,7 +123,7 @@ def SummarizeText(model,text):
 
     # model = Summarizer()
     # result = model(text, min_length=60)
-    result = model(text,num_sentences=200,min_length=10)
+    result = model(text,num_sentences=100,min_length=10)
     # full = ''.join(result)
     return result
 
@@ -377,18 +377,36 @@ class FileReader(BaseTool):
 
 class GoogleWebSearcher(BaseTool):
     name = "GoogleWebSearcher"
-    description = """Takes as input query string to search on Google and returns a list of urls with associated text from the search.
-    Input type: string #the search query message. It MUST be rephrased for a proper search on Google
+    description = """Takes as input query string to search on Google (defined as $QUERY_MESSAGE) and the number of links to search ($NUM_URLS).
+    $QUERY_MESSAGE MUST be rephrased for a proper search on Google.
+    Input type: List of strings # "["$QUERY_MESSAGE","$NUM_URLS"]".
     Output type: string #the name of the temporary saved file
     """
 
-    N_links:int = 5
+    max_N_links:int = 5
     text_verifier: TextVerifier = TextVerifier()
 
     def _run(self,message_search):
+
+        try:
+            message_ = (message_search.replace("[", "")).replace("]", "")
+            split_tries = ['",', "',"]
+            for split_ in split_tries:
+                message_list = message_.split(split_)
+                if len(message_list) > 1:
+                    break
+            message_search = message_list[0]
+            N_links = int(message_list[1])
+        except:
+            message_search = (message_search.replace("[", "")).replace("]", "")
+            N_links = self.max_N_links
+            pass
+
+        N_links = min(self.max_N_links, N_links)
+
         # to search
         results = ""
-        for n_urls,url in enumerate(search(message_search, tld="co.in", num=self.N_links, stop=self.N_links, pause=2)):
+        for n_urls,url in enumerate(search(message_search, tld="co.in", num=N_links, stop=N_links, pause=2)):
             # link_res = {}
 
             self.text_verifier.system_message = self.text_verifier.system_message.replace("{TASK_MESSAGE}",

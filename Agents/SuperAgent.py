@@ -26,7 +26,7 @@ class DataRetriever(BaseTool):
     description = """The tool responsible for extracting text from files, webpages, videos, and searching online.
     It MUST NOT be used with temporary txt files.
     It saves the data results in a temporary txt file.
-    Input type: string #the user message
+    Input type: string #the full user message
     Output type: string #the name of the saved file.
     """
     agent: BaseToolsAgent = None
@@ -138,11 +138,13 @@ def create_SuperAgent():
          and ConversationalAgent processes the user message and the retrieved data.
 
         The user will ask you to complete a task. You MUST choose what tool to use.
-        Your goal is to only properly call the tools. 
-        You MUST always reason if external resources are needed first or if you can directly use the conversational tool.
-        Reminder that DataRetriever MUST NOT be used with temporary txt files.
-        You should favour using ConversationalAgent with stored data over DataRetriever.
-        You MUST NOT add any additional text to the one output from the tools.
+        You MUST follow these rules:
+        1) Your goal is to only properly call the tools. 
+        2) You MUST always reason if external resources are needed first or if you can directly use the conversational tool.
+        3) Reminder that DataRetriever MUST NOT be used with temporary txt files.
+        4) You should favour using ConversationalAgent with stored data over DataRetriever.
+        5) You MUST NOT add any additional text to the one output from the tools.
+        6) You MUST pass the full input message to the tools.
         """
 
     prompts_kwargs = {'prefix': SUPERAGENT_PREFIX,
